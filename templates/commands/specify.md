@@ -1,13 +1,9 @@
 ---
-description: Create or update the feature specification from a natural language feature description.
+description: Create or update the modernization specification from a natural language legacy system description.
 handoffs: 
-  - label: Build Technical Plan
+  - label: Build Modernization Plan
     agent: speckit.plan
-    prompt: Create a plan for the spec. I am building with...
-  - label: Clarify Spec Requirements
-    agent: speckit.clarify
-    prompt: Clarify specification requirements
-    send: true
+    prompt: Create a modernization plan for the spec. I am modernizing with...
 scripts:
   sh: scripts/bash/create-new-feature.sh --json "{ARGS}"
   ps: scripts/powershell/create-new-feature.ps1 -Json "{ARGS}"
@@ -21,23 +17,25 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+*Describe what legacy system or component you want to modernize. Focus on the **current state pain points**, **desired future state**, and **business value**. Include existing system architecture, technical debt areas, user impact concerns, and modernization success criteria. Consider mind-mapping key modernization areas.*
+
 ## Outline
 
-The text the user typed after `/speckit.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/speckit.specify` in the triggering message **is** the modernization description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
-Given that feature description, do this:
+Given that modernization description, do this:
 
-1. **Generate a concise short name** (2-4 words) for the branch:
-   - Analyze the feature description and extract the most meaningful keywords
-   - Create a 2-4 word short name that captures the essence of the feature
-   - Use action-noun format when possible (e.g., "add-user-auth", "fix-payment-bug")
-   - Preserve technical terms and acronyms (OAuth2, API, JWT, etc.)
-   - Keep it concise but descriptive enough to understand the feature at a glance
+1. **Generate a concise short name** (2-4 words) for the modernization branch:
+   - Analyze the legacy system description and extract the most meaningful keywords
+   - Create a 2-4 word short name that captures the essence of the modernization
+   - Use action-noun format when possible (e.g., "modernize-payment-api", "migrate-user-store")
+   - Preserve technical terms and legacy system names (COBOL, mainframe, Oracle, etc.)
+   - Keep it concise but descriptive enough to understand the modernization at a glance
    - Examples:
-     - "I want to add user authentication" → "user-auth"
-     - "Implement OAuth2 integration for the API" → "oauth2-api-integration"
-     - "Create a dashboard for analytics" → "analytics-dashboard"
-     - "Fix payment processing timeout bug" → "fix-payment-timeout"
+     - "I want to modernize our COBOL payment system" → "modernize-cobol-payments"
+     - "Migrate Oracle database to cloud-native solution" → "migrate-oracle-cloud"
+     - "Replace legacy user management system" → "replace-legacy-users"
+     - "Modernize mainframe batch processing" → "modernize-mainframe-batch"
 
 2. **Check for existing branches before creating new one**:
 

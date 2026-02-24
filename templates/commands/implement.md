@@ -1,5 +1,5 @@
 ---
-description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
+description: Execute the modernization plan by implementing strangler-fig patterns and migration steps as defined in the plan
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
@@ -12,6 +12,8 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+*Execute the modernization systematically using strangler-fig patterns. Focus on incremental value delivery, maintaining backward compatibility, and ensuring rollback capabilities at each step.*
 
 ## Outline
 

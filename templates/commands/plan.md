@@ -1,13 +1,10 @@
 ---
-description: Execute the implementation planning workflow using the plan template to generate design artifacts.
+description: Execute the modernization planning workflow using the plan template to generate strangler-fig design artifacts and mind maps.
 handoffs: 
-  - label: Create Tasks
-    agent: speckit.tasks
-    prompt: Break the plan into tasks
+  - label: Implement Modernization
+    agent: speckit.implement
+    prompt: Execute the modernization plan
     send: true
-  - label: Create Checklist
-    agent: speckit.checklist
-    prompt: Create a checklist for the following domain...
 scripts:
   sh: scripts/bash/setup-plan.sh --json
   ps: scripts/powershell/setup-plan.ps1 -Json
@@ -23,6 +20,8 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+*Provide modernization technical approach, preferred technology stack for replacement components, strangler-fig implementation strategy, and migration constraints. This is where you specify the **how** for the modernization based on the **what** from the specification. Include mind map structure for complex modernization areas and solid rollback plans.*
 
 ## Outline
 

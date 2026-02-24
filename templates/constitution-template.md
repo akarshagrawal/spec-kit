@@ -1,22 +1,22 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# [PROJECT_NAME] Modernization Constitution
+<!-- Example: Legacy System Modernization Constitution, Platform Migration Constitution, etc. -->
 
-## Core Principles
+## Core Modernization Principles
 
 ### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
+<!-- Example: I. Strangler-Fig Pattern (NON-NEGOTIABLE) -->
 [PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+<!-- Example: All modernization follows strangler-fig pattern; New functionality wraps legacy gradually; Legacy components retired only after new system proves stable; No big-bang migrations -->
 
 ### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
+<!-- Example: II. Risk-First Assessment -->
 [PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+<!-- Example: Identify highest-risk legacy components first; Prioritize by business impact and technical debt; Document dependencies before touching any legacy code; Create rollback plans for every migration step -->
 
 ### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+<!-- Example: III. Incremental Value Delivery -->
 [PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+<!-- Example: Every modernization phase must deliver measurable business value; Users see improvements continuously; No feature freezes during modernization; Maintain backward compatibility until deprecation -->
 
 ### [PRINCIPLE_4_NAME]
 <!-- Example: IV. Integration Testing -->

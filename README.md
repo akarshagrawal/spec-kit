@@ -1,11 +1,11 @@
 <div align="center">
     <img src="./media/logo_large.webp" alt="Spec Kit Logo" width="200" height="200"/>
-    <h1>🌱 Spec Kit</h1>
-    <h3><em>Build high-quality software faster.</em></h3>
+    <h1>🌱 Modernization Spec Kit</h1>
+    <h3><em>Modernize legacy systems faster with strangler-fig patterns.</em></h3>
 </div>
 
 <p align="center">
-    <strong>An open source toolkit that allows you to focus on product scenarios and predictable outcomes instead of vibe coding every piece from scratch.</strong>
+    <strong>An open source toolkit that allows you to focus on modernization scenarios and predictable legacy system transformation using strangler-fig patterns.</strong>
 </p>
 
 <p align="center">
@@ -35,9 +35,9 @@
 - [🙏 Acknowledgements](#-acknowledgements)
 - [📄 License](#-license)
 
-## 🤔 What is Spec-Driven Development?
+## 🤔 What is Specification-Driven Modernization?
 
-Spec-Driven Development **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. Spec-Driven Development changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
+Specification-Driven Modernization **flips the script** on traditional legacy system transformation. For decades, modernization has been reactive — specifications were just documentation we wrote after struggling with legacy code. Specification-Driven Modernization changes this: **modernization specifications become executable**, directly generating working transformation plans using strangler-fig patterns rather than just hoping for the best.
 
 ## ⚡ Get Started
 
@@ -260,14 +260,14 @@ After running `specify init`, your AI coding agent will have access to these sla
 
 #### Core Commands
 
-Essential commands for the Spec-Driven Development workflow:
+Essential commands for the Specification-Driven Modernization workflow:
 
 | Command                 | Description                                                              |
 | ----------------------- | ------------------------------------------------------------------------ |
-| `/speckit.constitution` | Create or update project governing principles and development guidelines |
-| `/speckit.specify`      | Define what you want to build (requirements and user stories)            |
-| `/speckit.plan`         | Create technical implementation plans with your chosen tech stack        |
-| `/speckit.tasks`        | Generate actionable task lists for implementation                        |
+| `/speckit.constitution` | Create or update modernization governing principles and strangler-fig guidelines |
+| `/speckit.specify`      | Define what legacy system you want to modernize (current state and desired future) |
+| `/speckit.plan`         | Create modernization implementation plans with mind maps and strangler-fig strategy |
+| `/speckit.implement`    | Execute modernization systematically using incremental strangler-fig patterns |
 | `/speckit.implement`    | Execute all tasks to build the feature according to the plan             |
 
 #### Optional Commands

@@ -1,9 +1,9 @@
 ---
-description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
+description: Create or update the modernization constitution with principles focused on strangler-fig patterns, risk assessment, and incremental value delivery.
 handoffs: 
-  - label: Build Specification
+  - label: Build Modernization Specification
     agent: speckit.specify
-    prompt: Implement the feature specification based on the updated constitution. I want to build...
+    prompt: Create modernization specification based on the updated constitution. I want to modernize...
 ---
 
 ## User Input
@@ -13,6 +13,8 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+*Your input should establish governing principles for modernization. Be specific about strangler-fig implementation, risk management, legacy system assessment, migration strategies, rollback procedures, and modernization quality gates that should guide all modernization decisions.*
 
 ## Outline
 
