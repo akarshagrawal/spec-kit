@@ -1024,10 +1024,9 @@ DEFAULT_SKILLS_DIR = ".agents/skills"
 
 # Enhanced descriptions for each spec-kit command skill
 SKILL_DESCRIPTIONS = {
-    "specify": "Create or update feature specifications from natural language descriptions. Use when starting new features or refining requirements. Generates spec.md with user stories, functional requirements, and acceptance criteria following spec-driven development methodology.",
-    "plan": "Generate technical implementation plans from feature specifications. Use after creating a spec to define architecture, tech stack, and implementation phases. Creates plan.md with detailed technical design.",
-    "tasks": "Break down implementation plans into actionable task lists. Use after planning to create a structured task breakdown. Generates tasks.md with ordered, dependency-aware tasks.",
-    "implement": "Execute all tasks from the task breakdown to build the feature. Use after task generation to systematically implement the planned solution following TDD approach where applicable.",
+    "analyse": "Perform comprehensive codebase analysis after constitution is established. Scans folder structure, identifies architecture layers (frontend, backend, data, infra), maps business logic to files/modules, detects tech stack, and produces a structured analysis report for modernisation planning.",
+    "createspecs": "Create comprehensive modernisation specifications from codebase analysis. Combines research, user stories with acceptance criteria, data model changes, contract changes, and task breakdown into a single spec document. Use after analyse to define the full modernisation plan.",
+    "implement": "Execute all tasks from the modernisation specification to build the modernised system. Use after createspecs to systematically implement user stories following TDD approach where applicable.",
     "analyze": "Perform cross-artifact consistency analysis across spec.md, plan.md, and tasks.md. Use after task generation to identify gaps, duplications, and inconsistencies before implementation.",
     "clarify": "Structured clarification workflow for underspecified requirements. Use before planning to resolve ambiguities through coverage-based questioning. Records answers in spec clarifications section.",
     "constitution": "Create or update project governing principles and development guidelines. Use at project start to establish code quality, testing standards, and architectural constraints that guide all development.",

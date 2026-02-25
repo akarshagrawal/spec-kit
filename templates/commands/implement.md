@@ -1,5 +1,5 @@
 ---
-description: Execute the modernization plan by implementing strangler-fig patterns and migration steps as defined in the plan
+description: Execute the modernisation spec by implementing user stories and acceptance criteria as defined in the createspecs output
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
@@ -51,12 +51,9 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Automatically proceed to step 3
 
 3. Load and analyze the implementation context:
-   - **REQUIRED**: Read tasks.md for the complete task list and execution plan
-   - **REQUIRED**: Read plan.md for tech stack, architecture, and file structure
-   - **IF EXISTS**: Read data-model.md for entities and relationships
-   - **IF EXISTS**: Read contracts/ for API specifications and test requirements
-   - **IF EXISTS**: Read research.md for technical decisions and constraints
-   - **IF EXISTS**: Read quickstart.md for integration scenarios
+   - **REQUIRED**: Read spec.md for the complete modernisation specification including user stories, acceptance criteria, research, and task breakdown
+   - **IF EXISTS**: Read analysis-report.md for codebase context and architecture mapping
+   - **IF EXISTS**: Read any supplementary data-model or contracts documents
 
 4. **Project Setup Verification**:
    - **REQUIRED**: Create/verify ignore files based on actual project setup:
@@ -137,4 +134,4 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Confirm the implementation follows the technical plan
    - Report final status with summary of completed work
 
-Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
+Note: This command assumes a complete task breakdown exists in the spec.md (under "Task Breakdown" section). If tasks are incomplete or missing, suggest running `/speckit.createspecs` first to generate the modernisation specification.

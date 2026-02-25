@@ -1,9 +1,9 @@
 ---
 description: Create or update the modernization constitution with principles focused on strangler-fig patterns, risk assessment, and incremental value delivery.
 handoffs: 
-  - label: Build Modernization Specification
-    agent: speckit.specify
-    prompt: Create modernization specification based on the updated constitution. I want to modernize...
+  - label: Analyse Codebase
+    agent: speckit.analyse
+    prompt: Analyse the codebase based on the updated constitution to create a modernisation analysis report.
 ---
 
 ## User Input
