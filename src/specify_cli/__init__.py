@@ -676,11 +676,24 @@ def build_local_template(project_path: Path, ai_assistant: str, script_type: str
     """
     import re as _re
 
-    # Locate the repo root (where templates/ lives)
-    repo_root = Path(__file__).resolve().parent.parent.parent  # src/specify_cli/__init__.py -> repo root
-    templates_commands_dir = repo_root / "templates" / "commands"
-    templates_dir = repo_root / "templates"
-    scripts_dir = repo_root / "scripts"
+    # Locate the templates and scripts directories.
+    # When installed as a wheel (e.g. via uvx), they live inside the package
+    # as data/templates and data/scripts (via hatch force-include).
+    # When running from the repo source tree, fall back to the repo root.
+    package_dir = Path(__file__).resolve().parent  # src/specify_cli/
+    data_dir = package_dir / "data"
+
+    if (data_dir / "templates" / "commands").is_dir():
+        # Installed as a wheel — use bundled data
+        templates_commands_dir = data_dir / "templates" / "commands"
+        templates_dir = data_dir / "templates"
+        scripts_dir = data_dir / "scripts"
+    else:
+        # Running from repo source tree
+        repo_root = package_dir.parent.parent  # src/specify_cli -> src -> repo root
+        templates_commands_dir = repo_root / "templates" / "commands"
+        templates_dir = repo_root / "templates"
+        scripts_dir = repo_root / "scripts"
 
     if not templates_commands_dir.is_dir():
         raise RuntimeError(f"Cannot find templates/commands/ at {templates_commands_dir}")
