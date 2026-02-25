@@ -1027,11 +1027,7 @@ SKILL_DESCRIPTIONS = {
     "analyse": "Perform comprehensive codebase analysis after constitution is established. Scans folder structure, identifies architecture layers (frontend, backend, data, infra), maps business logic to files/modules, detects tech stack, and produces a structured analysis report for modernisation planning.",
     "createspecs": "Create comprehensive modernisation specifications from codebase analysis. Combines research, user stories with acceptance criteria, data model changes, contract changes, and task breakdown into a single spec document. Use after analyse to define the full modernisation plan.",
     "implement": "Execute all tasks from the modernisation specification to build the modernised system. Use after createspecs to systematically implement user stories following TDD approach where applicable.",
-    "analyze": "Perform cross-artifact consistency analysis across spec.md, plan.md, and tasks.md. Use after task generation to identify gaps, duplications, and inconsistencies before implementation.",
-    "clarify": "Structured clarification workflow for underspecified requirements. Use before planning to resolve ambiguities through coverage-based questioning. Records answers in spec clarifications section.",
     "constitution": "Create or update project governing principles and development guidelines. Use at project start to establish code quality, testing standards, and architectural constraints that guide all development.",
-    "checklist": "Generate custom quality checklists for validating requirements completeness and clarity. Use to create unit tests for English that ensure spec quality before implementation.",
-    "taskstoissues": "Convert tasks from tasks.md into GitHub issues. Use after task breakdown to track work items in GitHub project management.",
 }
 
 
