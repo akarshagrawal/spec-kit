@@ -666,6 +666,217 @@ def merge_json_files(existing_path: Path, new_content: dict, verbose: bool = Fal
 
     return merged
 
+def build_local_template(project_path: Path, ai_assistant: str, script_type: str = "sh",
+                         is_current_dir: bool = False, *, verbose: bool = True,
+                         tracker: StepTracker | None = None) -> Path:
+    """Build agent-specific command files from local templates instead of downloading from GitHub.
+
+    This replicates the logic of create-release-packages.sh but in Python, so that
+    `specify init` works from a git-installed fork without needing a GitHub Release.
+    """
+    import re as _re
+
+    # Locate the repo root (where templates/ lives)
+    repo_root = Path(__file__).resolve().parent.parent.parent  # src/specify_cli/__init__.py -> repo root
+    templates_commands_dir = repo_root / "templates" / "commands"
+    templates_dir = repo_root / "templates"
+    scripts_dir = repo_root / "scripts"
+
+    if not templates_commands_dir.is_dir():
+        raise RuntimeError(f"Cannot find templates/commands/ at {templates_commands_dir}")
+
+    if tracker:
+        tracker.start("fetch", "using local templates")
+
+    # --- Create project directory if new ---
+    if not is_current_dir:
+        project_path.mkdir(parents=True, exist_ok=True)
+
+    # --- Copy .specify/ base structure ---
+    specify_dir = project_path / ".specify"
+
+    # Copy scripts (filtered by script_type)
+    if scripts_dir.is_dir():
+        target_scripts = specify_dir / "scripts"
+        target_scripts.mkdir(parents=True, exist_ok=True)
+        if script_type == "sh" and (scripts_dir / "bash").is_dir():
+            shutil.copytree(scripts_dir / "bash", target_scripts / "bash", dirs_exist_ok=True)
+        elif script_type == "ps" and (scripts_dir / "powershell").is_dir():
+            shutil.copytree(scripts_dir / "powershell", target_scripts / "powershell", dirs_exist_ok=True)
+        # Copy root-level script files
+        for f in scripts_dir.iterdir():
+            if f.is_file():
+                shutil.copy2(f, target_scripts / f.name)
+
+    # Copy templates (excluding commands/ subdirectory and vscode-settings.json)
+    if templates_dir.is_dir():
+        target_templates = specify_dir / "templates"
+        target_templates.mkdir(parents=True, exist_ok=True)
+        for f in templates_dir.iterdir():
+            if f.is_file() and f.name != "vscode-settings.json":
+                shutil.copy2(f, target_templates / f.name)
+
+    if tracker:
+        tracker.complete("fetch", "local templates loaded")
+        tracker.add("download", "Download template")
+        tracker.complete("download", "skipped (local build)")
+
+    # --- Path rewriting (same as rewrite_paths in the shell script) ---
+    def rewrite_paths(text: str) -> str:
+        text = _re.sub(r'(/?)memory/', r'.specify/memory/', text)
+        text = _re.sub(r'(/?)scripts/', r'.specify/scripts/', text)
+        text = _re.sub(r'(/?)templates/', r'.specify/templates/', text)
+        text = text.replace('.specify.specify/', '.specify/')
+        return text
+
+    # --- Process each template command file ---
+    def _parse_frontmatter(content: str):
+        """Extract YAML frontmatter and body from a template file."""
+        if not content.startswith('---\n'):
+            return {}, content
+        parts = content.split('---\n', 2)
+        if len(parts) < 3:
+            return {}, content
+        try:
+            fm = yaml.safe_load(parts[1]) or {}
+        except yaml.YAMLError:
+            fm = {}
+        body = '---\n' + parts[1] + '---\n' + parts[2]
+        return fm, body
+
+    def _strip_script_sections(body: str) -> str:
+        """Remove scripts: and agent_scripts: sections from frontmatter."""
+        lines = body.split('\n')
+        result = []
+        in_frontmatter = False
+        skip_section = False
+        dash_count = 0
+        for line in lines:
+            if line.strip() == '---':
+                dash_count += 1
+                if dash_count == 1:
+                    in_frontmatter = True
+                elif dash_count == 2:
+                    in_frontmatter = False
+                    skip_section = False
+                result.append(line)
+                continue
+            if in_frontmatter:
+                if line.startswith('scripts:') or line.startswith('agent_scripts:'):
+                    skip_section = True
+                    continue
+                if skip_section and (line.startswith('  ') or line.startswith('\t')):
+                    continue
+                if skip_section and line and not line[0].isspace():
+                    skip_section = False
+            result.append(line)
+        return '\n'.join(result)
+
+    # Determine agent-specific settings
+    agent_cfg = AGENT_CONFIG.get(ai_assistant, {})
+    agent_folder = agent_cfg.get("folder", ".speckit/")
+    commands_subdir = agent_cfg.get("commands_subdir", "commands")
+
+    # Copilot uses .github/agents/ with .agent.md and companion .prompt.md files
+    is_copilot = ai_assistant == "copilot"
+    # Gemini and Qwen use TOML format with {{args}}
+    is_toml = ai_assistant in ("gemini", "qwen")
+
+    if is_copilot:
+        agents_dir = project_path / ".github" / "agents"
+        prompts_dir = project_path / ".github" / "prompts"
+        agents_dir.mkdir(parents=True, exist_ok=True)
+        prompts_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        commands_dir = project_path / agent_folder.rstrip("/") / commands_subdir
+        commands_dir.mkdir(parents=True, exist_ok=True)
+
+    # Determine ARG placeholder
+    arg_placeholder = "{{args}}" if is_toml else "$ARGUMENTS"
+    script_variant = script_type  # "sh" or "ps"
+
+    template_files = sorted(templates_commands_dir.glob("*.md"))
+    generated_count = 0
+
+    if tracker:
+        tracker.start("extract", "generating agent commands")
+
+    for template_path in template_files:
+        name = template_path.stem  # e.g., "analyse", "createspecs", etc.
+        content = template_path.read_text(encoding='utf-8').replace('\r', '')
+
+        fm, body = _parse_frontmatter(content)
+
+        # Extract the script command for the selected variant
+        scripts_section = fm.get("scripts", {})
+        script_command = scripts_section.get(script_variant, "") if isinstance(scripts_section, dict) else ""
+
+        # Extract the agent_script command for the selected variant
+        agent_scripts_section = fm.get("agent_scripts", {})
+        agent_script_command = agent_scripts_section.get(script_variant, "") if isinstance(agent_scripts_section, dict) else ""
+
+        # Replace {SCRIPT} placeholder
+        body = body.replace("{SCRIPT}", script_command)
+
+        # Replace {AGENT_SCRIPT} placeholder
+        if agent_script_command:
+            body = body.replace("{AGENT_SCRIPT}", agent_script_command)
+
+        # Strip scripts/agent_scripts sections from frontmatter
+        body = _strip_script_sections(body)
+
+        # Substitute {ARGS} and __AGENT__
+        body = body.replace("{ARGS}", arg_placeholder)
+        body = body.replace("__AGENT__", ai_assistant)
+
+        # Rewrite paths
+        body = rewrite_paths(body)
+
+        description = fm.get("description", f"Spec Kit {name} command")
+
+        if is_toml:
+            # Escape backslashes for TOML strings
+            body = body.replace('\\', '\\\\')
+            file_content = f'description = "{description}"\n\nprompt = """\n{body}\n"""\n'
+            out_path = commands_dir / f"speckit.{name}.toml"
+        elif is_copilot:
+            out_path = agents_dir / f"speckit.{name}.agent.md"
+            file_content = body
+            # Create companion prompt file
+            prompt_content = f"---\nagent: speckit.{name}\n---\n"
+            (prompts_dir / f"speckit.{name}.prompt.md").write_text(prompt_content, encoding='utf-8')
+        else:
+            out_path = commands_dir / f"speckit.{name}.md"
+            file_content = body
+
+        out_path.write_text(file_content, encoding='utf-8')
+        generated_count += 1
+
+    # Copy VS Code settings for copilot
+    if is_copilot:
+        vscode_settings = templates_dir / "vscode-settings.json"
+        if vscode_settings.exists():
+            vscode_dir = project_path / ".vscode"
+            vscode_dir.mkdir(parents=True, exist_ok=True)
+            dest_settings = vscode_dir / "settings.json"
+            if dest_settings.exists():
+                # Merge settings
+                new_content = json.loads(vscode_settings.read_text(encoding='utf-8'))
+                merged = merge_json_files(dest_settings, new_content, verbose=False)
+                dest_settings.write_text(json.dumps(merged, indent=4) + '\n', encoding='utf-8')
+            else:
+                shutil.copy2(vscode_settings, dest_settings)
+
+    if tracker:
+        tracker.complete("extract", f"{generated_count} commands generated")
+        tracker.add("zip-list", "Archive contents")
+        tracker.complete("zip-list", f"{generated_count} template files (local)")
+        tracker.add("extracted-summary", "Extraction summary")
+        tracker.complete("extracted-summary", f"built locally from {len(template_files)} templates")
+
+    return project_path
+
+
 def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Tuple[Path, dict]:
     repo_owner = "github"
     repo_name = "spec-kit"
@@ -1428,7 +1639,7 @@ def init(
             local_ssl_context = ssl_context if verify else False
             local_client = httpx.Client(verify=local_ssl_context)
 
-            download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug, github_token=github_token)
+            build_local_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker)
 
             # For generic agent, rename placeholder directory to user-specified path
             if selected_ai == "generic" and ai_commands_dir:
